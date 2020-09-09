@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>トップページ画面</title>
+<link rel="stylesheet" href="../css/style.css">
+<script type="text/javascript" src="../js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="../js/top.js"></script>
+<script>
+	$(function() {
+		//TODO ログイン画面から情報を取得してセット予定
+		var user_para = "1"
+		//データ
+		var request = new XMLHttpRequest();
+		request.open('GET', 'http://localhost:8080/WebFrontUI/users?user_id=' + user_para, true);
+		request.responseType = 'json';
+
+		request.onload = function() {
+			var data = this.response;
+			//ユーザ情報
+			for ( var i in data) {
+				$("#user_id").append(data[i].user_id);
+				$("#user_name").append(data[i].user_name);
+			}
+		};
+
+		request.send();
+	});
+	$(function() {
+		//TODO ログイン画面から情報を取得してセット予定
+		var user_para = "1"
+		//データ
+		var request = new XMLHttpRequest();
+		request.open('GET','http://localhost:8080/WebFrontUI/histories?user_id=' + user_para, true);
+		request.responseType = 'json';
+
+		request.onload = function() {
+			var data = this.response;
+			//出力する処理
+			for ( var i in data) {
+//				$(
+//						'<tr>'
+//						+ '<td>' + data[i].course_id + '</td>'
+//						+ '<td>' + '</td>' + '</tr>')
+//						.appendTo('table.tbl tbody');
+
+				//講座情報取得
+				var secondRequest = new XMLHttpRequest();
+				secondRequest.addEventListener('load',function(){
+					var courseData = this.response;
+					for(var j in courseData){
+						$('<tr>'+
+						'<td>'+courseData[j].course_id+'</td>'+
+						'<td>'+courseData[j].course_name+'</td>'+
+						'</tr>').appendTo('table.tbl tbody');
+					}
+				});
+				secondRequest.open('GET','http://localhost:8080/WebFrontUI/courses?course_id=' + data[i].course_id,true);
+				secondRequest.responseType = 'json';
+				secondRequest.send();
+			}
+		};
+		request.send();
+	});
+
+</script>
+
+</head>
+<body>
+	<header>
+		<h1>トップページ画面</h1>
+	</header>
+
+	<p>
+		ユーザ情報<BR> <label for="user_id">ユーザID：</label> <label id="user_id"></label><BR>
+
+		<label for="user_name">ユーザ名：</label> <label id="user_name"></label>
+
+	</p>
+
+	<div class="tableList">
+		<table border="1" class="tbl">学習履歴一覧
+			<col width="100" />
+			<col width="200" />
+			<thead>
+					<tr>
+					<th>コースID</th>
+					<th>コース名</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="tableList">
+		<table  border="1" class="tbl_course">講座一覧
+			<col width="100" />
+			<col width="200" />
+			<thead>
+				<tr>
+					<th>コースID</th>
+					<th>コース名</th>
+				</tr>
+			</thead>
+			<tbody id="course-table-body"></tbody>
+		</table>
+	</div>
+</body>
+</html>
